@@ -12,6 +12,13 @@ export default function TaskModal({ open, onClose, onSave, task, projectId, proj
     assignee: '', status: 'todo', priority: 'medium', dueDate: '', tags: ''
   });
   const [loading, setLoading] = useState(false);
+  const [workspaceMembers, setWorkspaceMembers] = useState([]);
+
+  useEffect(() => {
+    if (!projectMembers || projectMembers.length === 0) {
+      api.get('/users').then(res => setWorkspaceMembers(res.data)).catch(() => {});
+    }
+  }, [projectMembers]);
 
   useEffect(() => {
     if (task) {
@@ -51,7 +58,7 @@ export default function TaskModal({ open, onClose, onSave, task, projectId, proj
     }
   };
 
-  const members = projectMembers.length > 0 ? projectMembers : [];
+  const members = projectMembers?.length > 0 ? projectMembers : workspaceMembers;
 
   if (!open) return null;
   return (
