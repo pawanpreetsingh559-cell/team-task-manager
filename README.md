@@ -194,6 +194,25 @@ Use these pre-seeded accounts to test both roles immediately:
 
 ---
 
+## 🌱 Seed Demo Data
+
+To populate the database with demo users, projects and tasks:
+
+```bash
+cd backend
+node seed.js
+```
+
+This creates:
+- **1 Admin** — `admin@taskflow.com` / `Admin@123`
+- **2 Members** — `member@taskflow.com` / `Member@123` and `bob@taskflow.com` / `Member@123`
+- **3 Projects** — Website Redesign, Mobile App MVP, API Integration
+- **10 Tasks** — across all statuses (todo, in-progress, in-review, done) + 2 overdue tasks
+
+> ⚠️ Running `seed.js` clears existing data before seeding.
+
+---
+
 ## 🌐 Deployment on Railway
 
 ### Backend
