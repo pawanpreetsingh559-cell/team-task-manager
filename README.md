@@ -2,7 +2,21 @@
 
 > A production-ready full-stack web application for managing teams, projects, and tasks with role-based access control.
 
-![TaskFlow](https://img.shields.io/badge/Stack-MERN-blueviolet) ![License](https://img.shields.io/badge/License-MIT-green) ![Deployment](https://img.shields.io/badge/Deploy-Railway-purple)
+![TaskFlow](https://img.shields.io/badge/Stack-MERN-blueviolet) ![License](https://img.shields.io/badge/License-MIT-green) ![Deployment](https://img.shields.io/badge/Deploy-Railway-purple) ![Status](https://img.shields.io/badge/Status-Live-brightgreen)
+
+## 🌐 Live Demo
+
+| | URL |
+|---|---|
+| **🖥️ Frontend (Live App)** | [https://attractive-vibrancy-production-d9a0.up.railway.app](https://attractive-vibrancy-production-d9a0.up.railway.app) |
+| **⚙️ Backend API** | [https://team-task-manager-production-55f2.up.railway.app/api/health](https://team-task-manager-production-55f2.up.railway.app/api/health) |
+| **🐙 GitHub Repo** | [https://github.com/pawanpreetsingh559-cell/team-task-manager](https://github.com/pawanpreetsingh559-cell/team-task-manager) |
+
+### 🔑 Quick Login (use these to test both roles instantly)
+| Role | Email | Password |
+|------|-------|----------|
+| **⚡ Admin** | admin@taskflow.com | Admin@123 |
+| **👤 Member** | member@taskflow.com | Member@123 |
 
 ---
 
