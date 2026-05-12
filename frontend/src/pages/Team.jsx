@@ -12,6 +12,7 @@ export default function Team() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch]   = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     api.get('/users')
@@ -29,14 +30,22 @@ export default function Team() {
     } catch (err) { toast.error(err.response?.data?.error || 'Failed to update role.'); }
   };
 
-  const handleDelete = async (userId) => {
-    if (userId === currentUser._id) return toast.error("You can't delete yourself.");
-    if (!confirm('Remove this user from the platform?')) return;
+  const confirmDelete = (user) => {
+    if (user._id === currentUser._id) return toast.error("You can't delete yourself.");
+    setUserToDelete(user);
+  };
+
+  const executeDelete = async () => {
+    if (!userToDelete) return;
     try {
-      await api.delete(`/users/${userId}`);
-      setUsers(u => u.filter(x => x._id !== userId));
-      toast.success('User removed.');
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to remove user.'); }
+      await api.delete(`/users/${userToDelete._id}`);
+      setUsers(u => u.filter(x => x._id !== userToDelete._id));
+      toast.success('User removed from workspace.');
+      setUserToDelete(null);
+    } catch (err) { 
+      toast.error(err.response?.data?.error || 'Failed to remove user.'); 
+      setUserToDelete(null);
+    }
   };
 
   const filtered = users.filter(u => {
@@ -132,7 +141,7 @@ export default function Team() {
                     <td style={{ fontSize: 13, color: 'var(--text3)' }}>{formatDate(u.createdAt)}</td>
                     <td>
                       {u._id !== currentUser._id ? (
-                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u._id)}>
+                        <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(u)}>
                           <Trash2 size={12} /> Remove
                         </button>
                       ) : (
@@ -160,6 +169,27 @@ export default function Team() {
           </motion.div>
         ))}
       </div>
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {userToDelete && (
+          <div className="modal-overlay" onClick={() => setUserToDelete(null)}>
+            <motion.div className="modal" style={{ maxWidth: 400, textAlign: 'center', padding: '32px 24px' }} onClick={e => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--danger-light)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <Trash2 size={28} />
+              </div>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', marginBottom: 12 }}>Remove Member?</h2>
+              <p style={{ fontSize: 14, color: 'var(--text3)', lineHeight: 1.6, marginBottom: 28 }}>
+                Are you sure you want to remove <strong>{userToDelete.name}</strong> from the workspace? They will lose access to all projects and tasks. This action cannot be undone.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <button className="btn btn-secondary" style={{ justifyContent: 'center' }} onClick={() => setUserToDelete(null)}>Cancel</button>
+                <button className="btn btn-danger" style={{ justifyContent: 'center' }} onClick={executeDelete}>Yes, Remove</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
