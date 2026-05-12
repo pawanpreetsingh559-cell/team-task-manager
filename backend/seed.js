@@ -1,16 +1,15 @@
 /**
- * 🌱 Seed Script — Team Task Manager
- * Creates demo users, projects, and tasks so reviewers see a live, populated app.
+ * 🌱 Seed Script — TaskFlow Team Task Manager
+ * Clears the DB and populates fresh demo data.
  *
- * Usage (after deployment):
- *   node seed.js
+ * Usage:  cd backend && node seed.js
  *
- * Or locally:
- *   node seed.js
+ * ⚠️  NOTE: Passwords are passed as plain text — the User model's
+ *     pre('save') hook handles bcrypt hashing automatically.
+ *     Do NOT pre-hash passwords here or login will break (double-hash bug).
  */
 
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -26,27 +25,25 @@ async function seed() {
     await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB');
 
-    // Clear existing data
-    await User.deleteMany({});
-    await Project.deleteMany({});
+    // Clear ALL existing data
     await Task.deleteMany({});
+    await Project.deleteMany({});
+    await User.deleteMany({});
     console.log('🗑️  Cleared existing data');
 
-    // --- USERS ---
-    const salt = await bcrypt.genSalt(12);
-
+    // ─── USERS (plain text passwords — pre-save hook will hash them) ───
     const admin = await User.create({
       name: 'Pawanpreet Singh',
       email: 'admin@taskflow.com',
-      password: await bcrypt.hash('Admin@123', salt),
+      password: 'Admin@123',      // plain text — hook hashes it
       role: 'admin',
       avatar: ''
     });
 
     const alice = await User.create({
       name: 'Alice Johnson',
-      email: 'member@taskflow.com',
-      password: await bcrypt.hash('Member@123', salt),
+      email: 'alice@taskflow.com',
+      password: 'Alice@123',      // plain text — hook hashes it
       role: 'member',
       avatar: ''
     });
@@ -54,21 +51,21 @@ async function seed() {
     const bob = await User.create({
       name: 'Bob Martinez',
       email: 'bob@taskflow.com',
-      password: await bcrypt.hash('Member@123', salt),
+      password: 'Bob@123',        // plain text — hook hashes it
       role: 'member',
       avatar: ''
     });
 
-    console.log('👤 Created 3 users (1 admin + 2 members)');
+    console.log('👤 Created 3 users: 1 admin + 2 members');
 
-    // --- PROJECTS ---
+    // ─── PROJECTS ───
     const project1 = await Project.create({
       name: 'Website Redesign',
       description: 'Complete redesign of the company website with new branding and improved UX.',
       owner: admin._id,
       members: [alice._id, bob._id],
       status: 'active',
-      color: '#6366f1'
+      color: '#0ea5e9'
     });
 
     const project2 = await Project.create({
@@ -91,141 +88,101 @@ async function seed() {
 
     console.log('📁 Created 3 projects');
 
-    // --- TASKS ---
+    // ─── TASKS ───
     const now = new Date();
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const yesterday  = new Date(now - 24 * 60 * 60 * 1000);
+    const twoDaysAgo = new Date(now - 2 * 24 * 60 * 60 * 1000);
+    const tomorrow   = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const nextWeek   = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     await Task.create([
-      // Project 1 — Website Redesign
+      // ── Website Redesign ──
       {
         title: 'Design new homepage mockup',
         description: 'Create Figma mockups for the new homepage with updated brand colors and hero section.',
-        project: project1._id,
-        assignee: alice._id,
-        creator: admin._id,
-        status: 'done',
-        priority: 'high',
-        dueDate: yesterday,
+        project: project1._id, assignee: alice._id, creator: admin._id,
+        status: 'done', priority: 'high', dueDate: yesterday,
         tags: ['design', 'figma']
       },
       {
         title: 'Implement responsive navbar',
         description: 'Build a mobile-first responsive navigation bar with dropdown menus.',
-        project: project1._id,
-        assignee: alice._id,
-        creator: admin._id,
-        status: 'in-review',
-        priority: 'high',
-        dueDate: tomorrow,
+        project: project1._id, assignee: alice._id, creator: admin._id,
+        status: 'in-review', priority: 'high', dueDate: tomorrow,
         tags: ['frontend', 'css']
       },
       {
         title: 'SEO optimization',
         description: 'Add meta tags, Open Graph data, and structured data to all pages.',
-        project: project1._id,
-        assignee: bob._id,
-        creator: admin._id,
-        status: 'in-progress',
-        priority: 'medium',
-        dueDate: nextWeek,
+        project: project1._id, assignee: bob._id, creator: admin._id,
+        status: 'in-progress', priority: 'medium', dueDate: nextWeek,
         tags: ['seo']
       },
       {
         title: 'Performance audit & fixes',
         description: 'Run Lighthouse audit and fix all issues scoring below 90.',
-        project: project1._id,
-        assignee: bob._id,
-        creator: admin._id,
-        status: 'todo',
-        priority: 'urgent',
-        dueDate: yesterday, // overdue!
+        project: project1._id, assignee: bob._id, creator: admin._id,
+        status: 'todo', priority: 'urgent', dueDate: twoDaysAgo, // overdue
         tags: ['performance', 'lighthouse']
       },
 
-      // Project 2 — Mobile App MVP
+      // ── Mobile App MVP ──
       {
         title: 'Setup React Native project',
         description: 'Initialize RN project with Expo, configure navigation and state management.',
-        project: project2._id,
-        assignee: alice._id,
-        creator: admin._id,
-        status: 'done',
-        priority: 'high',
-        dueDate: yesterday,
+        project: project2._id, assignee: alice._id, creator: admin._id,
+        status: 'done', priority: 'high', dueDate: yesterday,
         tags: ['react-native', 'setup']
       },
       {
         title: 'Implement Auth screens',
         description: 'Build login, signup and forgot password screens with form validation.',
-        project: project2._id,
-        assignee: alice._id,
-        creator: admin._id,
-        status: 'in-progress',
-        priority: 'high',
-        dueDate: nextWeek,
+        project: project2._id, assignee: alice._id, creator: admin._id,
+        status: 'in-progress', priority: 'high', dueDate: nextWeek,
         tags: ['auth', 'ui']
       },
       {
         title: 'Push notification integration',
         description: 'Integrate Firebase Cloud Messaging for push notifications on iOS and Android.',
-        project: project2._id,
-        assignee: admin._id,
-        creator: admin._id,
-        status: 'todo',
-        priority: 'medium',
-        dueDate: nextWeek,
+        project: project2._id, assignee: admin._id, creator: admin._id,
+        status: 'todo', priority: 'medium', dueDate: nextWeek,
         tags: ['firebase', 'notifications']
       },
 
-      // Project 3 — API Integration
+      // ── API Integration ──
       {
         title: 'Stripe payment gateway',
         description: 'Integrate Stripe checkout for one-time and subscription payments.',
-        project: project3._id,
-        assignee: bob._id,
-        creator: admin._id,
-        status: 'in-progress',
-        priority: 'urgent',
-        dueDate: yesterday, // overdue!
+        project: project3._id, assignee: bob._id, creator: admin._id,
+        status: 'in-progress', priority: 'urgent', dueDate: yesterday, // overdue
         tags: ['stripe', 'payments']
       },
       {
         title: 'Google Analytics setup',
         description: 'Add GA4 tracking with custom events for user journey analysis.',
-        project: project3._id,
-        assignee: bob._id,
-        creator: admin._id,
-        status: 'todo',
-        priority: 'low',
-        dueDate: nextWeek,
+        project: project3._id, assignee: bob._id, creator: admin._id,
+        status: 'todo', priority: 'low', dueDate: nextWeek,
         tags: ['analytics', 'google']
       },
       {
         title: 'Write API documentation',
         description: 'Document all API endpoints using Swagger/OpenAPI spec.',
-        project: project3._id,
-        assignee: admin._id,
-        creator: admin._id,
-        status: 'todo',
-        priority: 'medium',
-        dueDate: nextWeek,
+        project: project3._id, assignee: admin._id, creator: admin._id,
+        status: 'todo', priority: 'medium', dueDate: nextWeek,
         tags: ['docs', 'swagger']
       }
     ]);
 
     console.log('✅ Created 10 tasks across 3 projects');
-
     console.log('\n🎉 Database seeded successfully!\n');
     console.log('📋 Demo Credentials:');
-    console.log('   Admin:  admin@taskflow.com  /  Admin@123');
-    console.log('   Member: member@taskflow.com /  Member@123');
-    console.log('   Member: bob@taskflow.com    /  Member@123\n');
+    console.log('   ⚡ Admin:  admin@taskflow.com  /  Admin@123');
+    console.log('   👤 Member: alice@taskflow.com  /  Alice@123');
+    console.log('   👤 Member: bob@taskflow.com    /  Bob@123\n');
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Seed error:', error);
+    console.error('❌ Seed error:', error.message);
     process.exit(1);
   }
 }

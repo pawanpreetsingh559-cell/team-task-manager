@@ -16,7 +16,8 @@
 | Role | Email | Password |
 |------|-------|----------|
 | **⚡ Admin** | admin@taskflow.com | Admin@123 |
-| **👤 Member** | member@taskflow.com | Member@123 |
+| **👤 Member** | alice@taskflow.com | Alice@123 |
+| **👤 Member** | bob@taskflow.com | Bob@123 |
 
 ---
 
@@ -219,7 +220,7 @@ node seed.js
 
 This creates:
 - **1 Admin** — `admin@taskflow.com` / `Admin@123`
-- **2 Members** — `member@taskflow.com` / `Member@123` and `bob@taskflow.com` / `Member@123`
+- **2 Members** — `alice@taskflow.com` / `Alice@123` and `bob@taskflow.com` / `Bob@123`
 - **3 Projects** — Website Redesign, Mobile App MVP, API Integration
 - **10 Tasks** — across all statuses (todo, in-progress, in-review, done) + 2 overdue tasks
 
