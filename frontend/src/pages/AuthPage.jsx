@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, CheckSquare, Users, TrendingUp, Shield } from 'lucide-react';
+import { Layers, BarChart2, Users, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const features = [
-  { icon: <CheckSquare size={20} />, title: 'Task Tracking', desc: 'Create, assign and track tasks across projects with real-time status updates.' },
-  { icon: <Users size={20} />, title: 'Team Collaboration', desc: 'Add members to projects and collaborate seamlessly with role-based access.' },
-  { icon: <TrendingUp size={20} />, title: 'Progress Insights', desc: 'Visual dashboard with stats, overdue alerts, and completion metrics.' },
-  { icon: <Shield size={20} />, title: 'Role-Based Access', desc: 'Admins manage teams and projects. Members focus on their tasks.' },
+  { icon: <Layers size={18} />, title: 'Structured Projects', desc: 'Organize work into projects with color-coded labels and member assignments.' },
+  { icon: <BarChart2 size={18} />, title: 'Real-time Progress', desc: 'Live dashboard with completion rates, overdue alerts and priority metrics.' },
+  { icon: <Users size={18} />, title: 'Team Collaboration', desc: 'Invite teammates, assign tasks, and move work forward together.' },
+  { icon: <ShieldCheck size={18} />, title: 'Role-Based Access', desc: 'Admins control projects; members stay focused on their assignments.' },
 ];
 
 export default function AuthPage() {
@@ -32,7 +32,7 @@ export default function AuthPage() {
         toast.success('Welcome back! 👋');
       } else {
         await signup({ name: form.name, email: form.email, password: form.password, role: form.role });
-        toast.success('Account created successfully! 🎉');
+        toast.success('Account created! 🚀');
       }
     } catch (err) {
       toast.error(err.response?.data?.error || 'Something went wrong.');
@@ -45,32 +45,43 @@ export default function AuthPage() {
     <div className="auth-page">
       {/* Left Panel */}
       <div className="auth-left">
-        <div className="blob" style={{ width: 400, height: 400, background: '#6366f1', top: '10%', left: '20%' }} />
-        <div className="blob" style={{ width: 300, height: 300, background: '#a855f7', bottom: '15%', right: '10%', animationDelay: '3s' }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 480 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
-            <div className="auth-logo-icon" style={{ width: 48, height: 48 }}>
-              <Zap size={24} color="white" fill="white" />
+        <div className="blob" style={{ width: 500, height: 500, background: '#0ea5e9', top: '-10%', left: '-10%' }} />
+        <div className="blob" style={{ width: 350, height: 350, background: '#f59e0b', bottom: '0%', right: '-5%', animationDelay: '4s' }} />
+
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 500 }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 52 }}>
+            <div style={{ width: 50, height: 50, borderRadius: 14, background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 24px rgba(14,165,233,0.4)' }}>
+              <Layers size={26} color="white" />
             </div>
-            <span style={{ fontSize: 28, fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>TaskFlow</span>
+            <span style={{ fontSize: 30, fontWeight: 900, color: '#fff', letterSpacing: '-1px' }}>
+              Task<span style={{ color: '#0ea5e9' }}>Flow</span>
+            </span>
           </div>
-          <h1 style={{ fontSize: 40, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: 16 }}>
-            Manage Teams,<br />
-            <span style={{ background: 'linear-gradient(135deg,#6366f1,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ship Faster.</span>
+
+          <h1 style={{ fontSize: 44, fontWeight: 900, color: '#fff', lineHeight: 1.15, marginBottom: 18, letterSpacing: '-1.5px' }}>
+            Build better.<br />
+            <span style={{ background: 'linear-gradient(90deg, #0ea5e9, #38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ship together.</span>
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16, marginBottom: 48, lineHeight: 1.6 }}>
-            The ultimate full-stack task management platform for modern teams — with kanban boards, role-based access, and real-time progress tracking.
+          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 16, marginBottom: 52, lineHeight: 1.7, maxWidth: 420 }}>
+            A full-stack team task manager with kanban boards, role-based access, and real-time progress tracking — built for modern teams.
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {features.map((f, i) => (
-              <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 + 0.3 }}
-                style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1', flexShrink: 0 }}>
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 + 0.2 }}
+                style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}
+              >
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(14,165,233,0.15)', border: '1px solid rgba(14,165,233,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0ea5e9', flexShrink: 0 }}>
                   {f.icon}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, color: '#fff', fontSize: 14, marginBottom: 3 }}>{f.title}</div>
-                  <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, lineHeight: 1.5 }}>{f.desc}</div>
+                  <div style={{ fontWeight: 700, color: '#e8edf5', fontSize: 14, marginBottom: 2 }}>{f.title}</div>
+                  <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, lineHeight: 1.55 }}>{f.desc}</div>
                 </div>
               </motion.div>
             ))}
@@ -81,9 +92,12 @@ export default function AuthPage() {
       {/* Right Panel */}
       <div className="auth-right">
         <motion.div className="auth-form-wrap" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+
           <div className="auth-logo">
-            <div className="auth-logo-icon"><Zap size={20} color="white" fill="white" /></div>
-            <span className="auth-logo-text">TaskFlow</span>
+            <div className="auth-logo-icon">
+              <Layers size={20} color="white" />
+            </div>
+            <span className="auth-logo-text">Task<span style={{ color: 'var(--primary)' }}>Flow</span></span>
           </div>
 
           <div className="auth-toggle">
@@ -92,8 +106,8 @@ export default function AuthPage() {
           </div>
 
           <AnimatePresence mode="wait">
-            <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <h2 className="auth-heading" style={{ marginTop: 20 }}>
+            <motion.div key={mode} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+              <h2 className="auth-heading" style={{ marginTop: 22 }}>
                 {mode === 'login' ? 'Welcome back' : 'Create account'}
               </h2>
               <p className="auth-sub">{mode === 'login' ? 'Sign in to your workspace' : 'Join your team on TaskFlow'}</p>
@@ -102,12 +116,12 @@ export default function AuthPage() {
                 {mode === 'signup' && (
                   <div className="form-group">
                     <label className="form-label">Full Name</label>
-                    <input name="name" className="form-input" placeholder="John Doe" value={form.name} onChange={handleChange} required />
+                    <input name="name" className="form-input" placeholder="Pawanpreet Singh" value={form.name} onChange={handleChange} required />
                   </div>
                 )}
                 <div className="form-group">
                   <label className="form-label">Email Address</label>
-                  <input name="email" type="email" className="form-input" placeholder="john@company.com" value={form.email} onChange={handleChange} required />
+                  <input name="email" type="email" className="form-input" placeholder="you@company.com" value={form.email} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Password</label>
@@ -122,8 +136,16 @@ export default function AuthPage() {
                     </div>
                   </div>
                 )}
-                <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '13px', marginTop: 8, fontSize: 15 }} disabled={loading}>
-                  {loading ? <><div className="spinner" /> Processing...</> : mode === 'login' ? 'Sign In →' : 'Create Account →'}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ width: '100%', justifyContent: 'center', padding: '13px', marginTop: 8, fontSize: 15, gap: 8 }}
+                  disabled={loading}
+                >
+                  {loading
+                    ? <><div className="spinner" /> Processing...</>
+                    : <>{mode === 'login' ? 'Sign In' : 'Create Account'} <ArrowRight size={16} /></>
+                  }
                 </button>
               </form>
 
