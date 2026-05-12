@@ -27,6 +27,7 @@ export default function ProjectDetail() {
   const [modalOpen, setModalOpen]   = useState(false);
   const [editTask, setEditTask]     = useState(null);
   const [detailTask, setDetailTask] = useState(null);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   const fetchAll = async () => {
     try {
@@ -61,14 +62,22 @@ export default function ProjectDetail() {
     } catch { toast.error('Failed to update status.'); }
   };
 
-  const handleDelete = async (taskId) => {
-    if (!confirm('Delete this task?')) return;
+  const confirmDelete = (task) => {
+    setTaskToDelete(task);
+  };
+
+  const executeDelete = async () => {
+    if (!taskToDelete) return;
     try {
-      await api.delete(`/tasks/${taskId}`);
-      setTasks(t => t.filter(x => x._id !== taskId));
-      setDetailTask(null);
+      await api.delete(`/tasks/${taskToDelete._id}`);
+      setTasks(t => t.filter(x => x._id !== taskToDelete._id));
+      if (detailTask?._id === taskToDelete._id) setDetailTask(null);
       toast.success('Task deleted.');
-    } catch { toast.error('Failed to delete task.'); }
+      setTaskToDelete(null);
+    } catch { 
+      toast.error('Failed to delete task.'); 
+      setTaskToDelete(null);
+    }
   };
 
   if (loading) return <div className="spinner-page"><div className="spinner-lg" /></div>;
@@ -118,11 +127,11 @@ export default function ProjectDetail() {
           <KanbanView tasks={tasks} onStatusChange={handleStatusChange}
             onEdit={t => { setEditTask(t); setModalOpen(true); }}
             onDetail={t => setDetailTask(t)}
-            onDelete={handleDelete} />
+            onDelete={confirmDelete} />
         ) : (
           <ListView tasks={tasks}
             onEdit={t => { setEditTask(t); setModalOpen(true); }}
-            onDelete={handleDelete}
+            onDelete={confirmDelete}
             onStatusChange={handleStatusChange} />
         )}
       </div>
@@ -144,7 +153,7 @@ export default function ProjectDetail() {
               <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>Task Detail</span>
               <div style={{ display: 'flex', gap: 6 }}>
                 <button className="btn btn-ghost btn-icon btn-sm" onClick={() => { setEditTask(detailTask); setDetailTask(null); setModalOpen(true); }}><Edit2 size={14} /></button>
-                <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => handleDelete(detailTask._id)}><Trash2 size={14} /></button>
+                <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => confirmDelete(detailTask)}><Trash2 size={14} /></button>
                 <button className="btn btn-ghost btn-icon" onClick={() => setDetailTask(null)}>✕</button>
               </div>
             </div>
@@ -186,6 +195,28 @@ export default function ProjectDetail() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {taskToDelete && (
+          <div className="modal-overlay" onClick={() => setTaskToDelete(null)} style={{ zIndex: 1000 }}>
+            <motion.div className="modal" style={{ maxWidth: 400, textAlign: 'center', padding: '32px 24px' }} onClick={e => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--danger-light)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <Trash2 size={28} />
+              </div>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', marginBottom: 12 }}>Delete Task?</h2>
+              <p style={{ fontSize: 14, color: 'var(--text3)', lineHeight: 1.6, marginBottom: 28 }}>
+                Are you sure you want to delete the task <strong>"{taskToDelete.title}"</strong>? This action cannot be undone.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <button className="btn btn-secondary" style={{ justifyContent: 'center' }} onClick={() => setTaskToDelete(null)}>Cancel</button>
+                <button className="btn btn-danger" style={{ justifyContent: 'center' }} onClick={executeDelete}>Yes, Delete</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -220,7 +251,7 @@ function KanbanView({ tasks, onStatusChange, onEdit, onDetail, onDelete }) {
                       <span className="kanban-card-title">{task.title}</span>
                       <div style={{ display: 'flex', gap: 2, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                         <button className="btn btn-ghost btn-icon" style={{ padding: 3 }} onClick={() => onEdit(task)}><Edit2 size={11} /></button>
-                        <button className="btn btn-ghost btn-icon" style={{ padding: 3, color: 'var(--danger)' }} onClick={() => onDelete(task._id)}><Trash2 size={11} /></button>
+                        <button className="btn btn-ghost btn-icon" style={{ padding: 3, color: 'var(--danger)' }} onClick={() => onDelete(task)}><Trash2 size={11} /></button>
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '8px 0' }}>
@@ -299,7 +330,7 @@ function ListView({ tasks, onEdit, onDelete, onStatusChange }) {
                 <td>
                   <div style={{ display: 'flex', gap: 4 }}>
                     <button className="btn btn-ghost btn-icon btn-sm" onClick={() => onEdit(task)}><Edit2 size={13} /></button>
-                    <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => onDelete(task._id)}><Trash2 size={13} /></button>
+                    <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => onDelete(task)}><Trash2 size={13} /></button>
                   </div>
                 </td>
               </tr>

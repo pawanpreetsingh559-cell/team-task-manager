@@ -101,6 +101,7 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editProject, setEditProject] = useState(null);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -126,13 +127,21 @@ export default function Projects() {
     setEditProject(null);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this project and all its tasks?')) return;
+  const confirmDelete = (project) => {
+    setProjectToDelete(project);
+  };
+
+  const executeDelete = async () => {
+    if (!projectToDelete) return;
     try {
-      await api.delete(`/projects/${id}`);
-      setProjects(p => p.filter(x => x._id !== id));
+      await api.delete(`/projects/${projectToDelete._id}`);
+      setProjects(p => p.filter(x => x._id !== projectToDelete._id));
       toast.success('Project deleted.');
-    } catch { toast.error('Failed to delete.'); }
+      setProjectToDelete(null);
+    } catch { 
+      toast.error('Failed to delete project.');
+      setProjectToDelete(null);
+    }
   };
 
   const statusColors = { active: 'var(--success)', completed: 'var(--info)', archived: 'var(--text3)' };
@@ -175,7 +184,7 @@ export default function Projects() {
                 {isAdmin && (
                   <div style={{ display: 'flex', gap: 4 }} onClick={e => e.stopPropagation()}>
                     <button className="btn btn-ghost btn-icon btn-sm" onClick={() => { setEditProject(p); setModalOpen(true); }}><Edit2 size={13} /></button>
-                    <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => handleDelete(p._id)}><Trash2 size={13} /></button>
+                    <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--danger)' }} onClick={() => confirmDelete(p)}><Trash2 size={13} /></button>
                   </div>
                 )}
               </div>
@@ -214,6 +223,28 @@ export default function Projects() {
       <AnimatePresence>
         {modalOpen && (
           <ProjectModal open={modalOpen} onClose={() => { setModalOpen(false); setEditProject(null); }} onSave={handleSave} project={editProject} allUsers={allUsers} />
+        )}
+      </AnimatePresence>
+
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {projectToDelete && (
+          <div className="modal-overlay" onClick={() => setProjectToDelete(null)} style={{ zIndex: 1000 }}>
+            <motion.div className="modal" style={{ maxWidth: 400, textAlign: 'center', padding: '32px 24px' }} onClick={e => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--danger-light)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <Trash2 size={28} />
+              </div>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', marginBottom: 12 }}>Delete Project?</h2>
+              <p style={{ fontSize: 14, color: 'var(--text3)', lineHeight: 1.6, marginBottom: 28 }}>
+                Are you sure you want to delete the project <strong>"{projectToDelete.name}"</strong>? This will also permanently delete all tasks within it. This action cannot be undone.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <button className="btn btn-secondary" style={{ justifyContent: 'center' }} onClick={() => setProjectToDelete(null)}>Cancel</button>
+                <button className="btn btn-danger" style={{ justifyContent: 'center' }} onClick={executeDelete}>Yes, Delete</button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

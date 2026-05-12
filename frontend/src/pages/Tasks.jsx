@@ -21,6 +21,7 @@ export default function Tasks() {
   const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask]   = useState(null);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   const fetchAll = async () => {
     try {
@@ -59,13 +60,21 @@ export default function Tasks() {
     } catch { toast.error('Failed to update status.'); }
   };
 
-  const handleDelete = async (taskId) => {
-    if (!confirm('Delete this task?')) return;
+  const confirmDelete = (task) => {
+    setTaskToDelete(task);
+  };
+
+  const executeDelete = async () => {
+    if (!taskToDelete) return;
     try {
-      await api.delete(`/tasks/${taskId}`);
-      setTasks(t => t.filter(x => x._id !== taskId));
+      await api.delete(`/tasks/${taskToDelete._id}`);
+      setTasks(t => t.filter(x => x._id !== taskToDelete._id));
       toast.success('Task deleted.');
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to delete task.'); }
+      setTaskToDelete(null);
+    } catch (err) { 
+      toast.error(err.response?.data?.error || 'Failed to delete task.');
+      setTaskToDelete(null);
+    }
   };
 
   const filtered = tasks.filter(t => {
@@ -136,7 +145,7 @@ export default function Tasks() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {overdueTasks.map((task, i) => (
-                  <TaskRow key={task._id} task={task} index={i} onEdit={() => { setEditTask(task); setModalOpen(true); }} onDelete={() => handleDelete(task._id)} onStatusChange={handleStatusChange} overdue />
+                  <TaskRow key={task._id} task={task} index={i} onEdit={() => { setEditTask(task); setModalOpen(true); }} onDelete={() => confirmDelete(task)} onStatusChange={handleStatusChange} overdue />
                 ))}
               </div>
             </div>
@@ -146,7 +155,7 @@ export default function Tasks() {
           {regularTasks.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {regularTasks.map((task, i) => (
-                <TaskRow key={task._id} task={task} index={i} onEdit={() => { setEditTask(task); setModalOpen(true); }} onDelete={() => handleDelete(task._id)} onStatusChange={handleStatusChange} />
+                <TaskRow key={task._id} task={task} index={i} onEdit={() => { setEditTask(task); setModalOpen(true); }} onDelete={() => confirmDelete(task)} onStatusChange={handleStatusChange} />
               ))}
             </div>
           )}
@@ -157,6 +166,28 @@ export default function Tasks() {
         {modalOpen && (
           <TaskModal open={modalOpen} onClose={() => { setModalOpen(false); setEditTask(null); }}
             onSave={handleSaveTask} task={editTask} allProjects={projects} />
+        )}
+      </AnimatePresence>
+
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {taskToDelete && (
+          <div className="modal-overlay" onClick={() => setTaskToDelete(null)}>
+            <motion.div className="modal" style={{ maxWidth: 400, textAlign: 'center', padding: '32px 24px' }} onClick={e => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--danger-light)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <Trash2 size={28} />
+              </div>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', marginBottom: 12 }}>Delete Task?</h2>
+              <p style={{ fontSize: 14, color: 'var(--text3)', lineHeight: 1.6, marginBottom: 28 }}>
+                Are you sure you want to delete the task <strong>"{taskToDelete.title}"</strong>? This action cannot be undone.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <button className="btn btn-secondary" style={{ justifyContent: 'center' }} onClick={() => setTaskToDelete(null)}>Cancel</button>
+                <button className="btn btn-danger" style={{ justifyContent: 'center' }} onClick={executeDelete}>Yes, Delete</button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
