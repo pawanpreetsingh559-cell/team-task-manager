@@ -17,7 +17,9 @@
     "mongoose": "^8.7.0"
   },
   "devDependencies": {
-    "mongodb-memory-server": "^11.1.0",
     "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
