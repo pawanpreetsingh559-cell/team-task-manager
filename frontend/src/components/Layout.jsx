@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
-import { LayoutDashboard, FolderKanban, CheckSquare, Users, LogOut, Zap } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, CheckSquare, Users, LogOut, Layers } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getAvatarColor, getInitials } from '../utils/helpers';
 
@@ -18,9 +18,9 @@ export default function Layout() {
       <aside className="sidebar">
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">
-            <Zap size={18} color="white" fill="white" />
+            <Layers size={20} color="white" />
           </div>
-          <span className="sidebar-logo-text">TaskFlow</span>
+          <span className="sidebar-logo-text">Task<span>Flow</span></span>
         </div>
 
         <p className="sidebar-section-label">Menu</p>
